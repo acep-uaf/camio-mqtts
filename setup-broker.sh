@@ -146,7 +146,7 @@ if [ $mqtt_auth_status ]; then
 fi
 
 echo "DEBUG: mqtt_config"
-echo "$mqtt_config"
+echo -e "$mqtt_config"
 
 #echo -e $mqtt_config > $mqtt_conf_file
 
