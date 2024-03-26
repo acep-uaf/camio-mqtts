@@ -43,10 +43,12 @@ losd_json=$(losd)
 os_name=$(echo $losd_json | jq '.DISTRO.NAME' | sed -r 's/"//g')
 os_version=$(echo $losd_json | jq '.DISTRO.VERSION' | sed -r 's/"//g')
 hw_platform=$(echo $losd_json | jq '.HARDWARE.HOSTNAMECTL.Chassis' | tr -dc '[:print:]' | sed -r 's/\s//g' | sed -r 's/"//g')
+ip_addr=$(echo $losd_json | jq .HARDWARE.NETWORK | jq -r '.[] | select(.INTERFACE != "lo") | .IPV4_ADDR')
 
 echo "OS Name:           $os_name"
 echo "OS Version:        $os_version"
 echo "Hardware Platform: $hw_platform"
+echo "IP Address:        $ip_addr"
 
 # Check if the OS is supported
 if [[ ! " ${supported_os[@]} " =~ " ${os_name} " ]]; then
@@ -66,5 +68,18 @@ fi
 
 # Install the necessary packages
 apt update
-apt install -y mosquitto mosquitto-clients
+apt install -y mosquitto mosquitto-clients ufw
+
+
+# Create a self-signed certificate
+
+# Create a directory to store the certificates
+
+# Configure MQTT Passwords
+
+# Configure the Mosquitto Broker
+
+# Configure the UFW Firewall
+
+# Enable and Start the Mosquitto Broker
 
