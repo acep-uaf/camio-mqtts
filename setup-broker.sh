@@ -156,11 +156,11 @@ fi
 # echo "DEBUG: mqtt_config"
 # echo -e "$mqtt_config"
 
-
 # Configure MQTT Passwords
 if [ $mqtt_auth_status ]; then
   # if ! /etc/mosquitto/passwd
   if [ ! -f /etc/mosquitto/passwd ]; then
+    echo ""
     echo "INFO: Creating Mosquitto Password File: $mqtt_passwd_file"
     echo "Please enter a password for the user: $mqtt_user"
     mosquitto_passwd -c $mqtt_passwd_file $mqtt_user
@@ -172,16 +172,33 @@ fi
 if [ ! -f $mqtt_tls_ca ] || [ ! -f $mqtt_tls_cert ] || [ ! -f $mqtt_tls_key ]; then
   # Based on example from:
   # openssl req -new -x509 -days 365 -nodes -out example.crt -keyout example.key -subj "/C=US/ST=YourState/L=YourCity/O=YourOrganization/OU=YourOrganizationalUnit/CN=example.com"
+  echo ""
+  echo "INFO: Creating Self-Signed Certificate"
   cert_subject="/C=$mqtt_cert_C/ST=$mqtt_cert_ST/L=$mqtt_cert_L/O=$mqtt_cert_O/OU=$mqtt_cert_OU/CN=$mqtt_cert_CN"
   openssl req -new -x509 -days $mqtt_cert_days -nodes -out $mqtt_tls_ca_cert -keyout $mqtt_tls_ca_key -subj $cert_subject
 fi
 
 # Configure the Mosquitto Broker
+echo ""
+echo "INFO: Configuring Mosquitto Broker: $mqtt_conf_file"
 echo -e $mqtt_config > $mqtt_conf_file
 
 # Configure the UFW Firewall
+echo ""
+echo "INFO: Configuring UFW Firewall"
 ufw allow $mqtt_port/tcp
 
 # Enable and Start the Mosquitto Broker
+echo ""
+echo "INFO: Enabling and Starting Mosquitto Broker"
 systemctl enable mosquitto
 
+# Restart the Mosquitto Broker
+echo ""
+echo "INFO: Restarting Mosquitto Broker"
+systemctl restart mosquitto
+
+# Check the status of the Mosquitto Broker
+echo ""
+echo "INFO: Checking the status of the Mosquitto Broker"
+systemctl status mosquitto
