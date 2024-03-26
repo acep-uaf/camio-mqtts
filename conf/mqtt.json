@@ -9,6 +9,7 @@
     },
     "CERT": {
         "TYPE": "self-signed",
+        "DAYS": 365,
         "SUBJECT": {
             "C": "US",
             "ST": "Alaska",
@@ -22,7 +23,8 @@
         "ENABLED": true,
         "HOST": "",
         "PORT": 8883,
-        "CA_CERT": "/etc/mosquitto/certs/ca.pem",
+        "CA_KEY": "/etc/mosquitto/certs/ca.key",
+        "CA_CERT": "/etc/mosquitto/certs/ca.crt",
         "CERTIFICATE": "/etc/mosquitto/certs/cert.pem",
         "PRIVATE_KEY": "/etc/mosquitto/certs/privkey.pem"
     },

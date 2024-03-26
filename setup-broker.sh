@@ -68,11 +68,20 @@ mqtt_port=$(echo $mqtt_json | jq '.BROKER.PORT' | sed -r 's/"//g')
 mqtt_tls_status=$(echo $mqtt_json | jq '.TLS.ENABLED' | sed -r 's/"//g')
 # if mqtt_tls_status is true, then set mqtt_tls_status to "Enabled", else set it to "Disabled"
 if [ $mqtt_tls_status ]; then
-  mqtt_tls_ca=$(echo $mqtt_json | jq '.TLS.CA_CERT' | sed -r 's/"//g')
+  mqtt_tls_ca_key=$(echo $mqtt_json | jq '.TLS.CA_KEY' | sed -r 's/"//g')
+  mqtt_tls_ca_cert=$(echo $mqtt_json | jq '.TLS.CA_CERT' | sed -r 's/"//g')
   mqtt_tls_cert=$(echo $mqtt_json | jq '.TLS.CERTIFICATE' | sed -r 's/"//g')
   mqtt_tls_key=$(echo $mqtt_json | jq '.TLS.PRIVATE_KEY' | sed -r 's/"//g')
   mqtt_host=$(echo $mqtt_json | jq '.TLS.HOST' | sed -r 's/"//g')
   mqtt_port=$(echo $mqtt_json | jq '.TLS.PORT' | sed -r 's/"//g')
+
+  mqtt_cert_days=$(echo $mqtt_json | jq '.CERT.DAYS' | sed -r 's/"//g')
+  mqtt_cert_C=$(echo $mqtt_json | jq '.CERT.SUBJECT.C' | sed -r 's/"//g')
+  mqtt_cert_ST=$(echo $mqtt_json | jq '.CERT.SUBJECT.ST' | sed -r 's/"//g')
+  mqtt_cert_L=$(echo $mqtt_json | jq '.CERT.SUBJECT.L' | sed -r 's/"//g')
+  mqtt_cert_O=$(echo $mqtt_json | jq '.CERT.SUBJECT.O' | sed -r 's/"//g')
+  mqtt_cert_OU=$(echo $mqtt_json | jq '.CERT.SUBJECT.OU' | sed -r 's/"//g')
+  mqtt_cert_CN=$(echo $mqtt_json | jq '.CERT.SUBJECT.CN' | sed -r 's/"//g')
 fi
 
 
@@ -144,27 +153,33 @@ if [ $mqtt_tls_status ]; then
     mqtt_config+="\n"
 fi
 
+# echo "DEBUG: mqtt_config"
+# echo -e "$mqtt_config"
 
-echo "DEBUG: mqtt_config"
-echo -e "$mqtt_config"
-
-#echo -e $mqtt_config > $mqtt_conf_file
 
 # Configure MQTT Passwords
-# if ! /etc/mosquitto/passwd
-# if [ ! -f /etc/mosquitto/passwd ]; then
-#     mosquitto_passwd -c /etc/mosquitto/passwd $mqtt_user
-# fi
-
+if [ $mqtt_auth_status ]; then
+  # if ! /etc/mosquitto/passwd
+  if [ ! -f /etc/mosquitto/passwd ]; then
+    mosquitto_passwd -c $mqtt_passwd_file $mqtt_user
+  fi
+fi
 
 # Create a self-signed certificate
-
-# Create a directory to store the certificates
-
+# If either file is missing: $mqtt_tls_ca, $mqtt_tls_cert or $mqtt_tls_key
+if [ ! -f $mqtt_tls_ca ] || [ ! -f $mqtt_tls_cert ] || [ ! -f $mqtt_tls_key ]; then
+  # Based on example from:
+  # openssl req -new -x509 -days 365 -nodes -out example.crt -keyout example.key -subj "/C=US/ST=YourState/L=YourCity/O=YourOrganization/OU=YourOrganizationalUnit/CN=example.com"
+  cert_subject="/C=$mqtt_cert_C/ST=$mqtt_cert_ST/L=$mqtt_cert_L/O=$mqtt_cert_O/OU=$mqtt_cert_OU/CN=$mqtt_cert_CN"
+  openssl req -new -x509 -days $mqtt_cert_days -nodes -out $mqtt_tls_ca_cert -keyout $mqtt_tls_ca_key -subj $cert_subject
+fi
 
 # Configure the Mosquitto Broker
+echo -e $mqtt_config > $mqtt_conf_file
 
 # Configure the UFW Firewall
+ufw allow $mqtt_port/tcp
 
 # Enable and Start the Mosquitto Broker
+systemctl enable mosquitto
 
