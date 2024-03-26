@@ -1,6 +1,6 @@
 {
     "CONFIG": {
-        "CONFIG_FILE": "/etc/mosquitto/conf.d/default.conf",
+        "CONF_FILE": "/etc/mosquitto/conf.d/default.conf",
         "PASSWD_FILE": "/etc/mosquitto/passwd"
     },
     "BROKER": {

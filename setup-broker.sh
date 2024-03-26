@@ -170,6 +170,7 @@ if [ $mqtt_auth_status ]; then
   fi
 fi
 
+
 # Create a self-signed certificate
 # If either file is missing: $mqtt_tls_ca, $mqtt_tls_cert or $mqtt_tls_key
 if [ ! -f $mqtt_tls_ca_key ] || [ ! -f $mqtt_tls_ca_cert ] || [ ! -f $mqtt_tls_cert ] || [ ! -f $mqtt_tls_key ]; then
@@ -178,12 +179,37 @@ if [ ! -f $mqtt_tls_ca_key ] || [ ! -f $mqtt_tls_ca_cert ] || [ ! -f $mqtt_tls_c
   echo ""
   echo "INFO: Creating Self-Signed Certificate"
   cert_subject="/C=$mqtt_cert_C/ST=$mqtt_cert_ST/L=$mqtt_cert_L/O=$mqtt_cert_O/OU=$mqtt_cert_OU/CN=$mqtt_cert_CN"
-  openssl req -new -x509 -days $mqtt_cert_days -nodes -out $mqtt_tls_ca_cert -keyout $mqtt_tls_ca_key -subj $cert_subject
-
+  
+  # Create the directories for the certificate files if they do not exist
+  mkdir -p $(dirname $mqtt_tls_ca_cert) $(dirname $mqtt_tls_ca_key) $(dirname $mqtt_tls_cert) $(dirname $mqtt_tls_key)
+  
+  # Generate the CA key and certificate files
+  openssl genpkey -algorithm RSA -out $mqtt_tls_ca_key
+  openssl req -new -x509 -key $mqtt_tls_ca_key -out $mqtt_tls_ca_cert -days $mqtt_cert_days -subj $cert_subject
+  
+  # Generate the server key and certificate files
+  openssl genpkey -algorithm RSA -out $mqtt_tls_key
+  openssl req -new -key $mqtt_tls_key -out $mqtt_tls_cert -subj $cert_subject
+  
   # Set the permissions on the certificate files
   chmod 600 $mqtt_tls_ca_key $mqtt_tls_ca_cert $mqtt_tls_cert $mqtt_tls_key
   chown mosquitto:mosquitto $mqtt_tls_ca_key $mqtt_tls_ca_cert $mqtt_tls_cert $mqtt_tls_key
 fi
+
+# # Create a self-signed certificate
+# # If either file is missing: $mqtt_tls_ca, $mqtt_tls_cert or $mqtt_tls_key
+# if [ ! -f $mqtt_tls_ca_key ] || [ ! -f $mqtt_tls_ca_cert ] || [ ! -f $mqtt_tls_cert ] || [ ! -f $mqtt_tls_key ]; then
+#   # Based on example from:
+#   # openssl req -new -x509 -days 365 -nodes -out example.crt -keyout example.key -subj "/C=US/ST=YourState/L=YourCity/O=YourOrganization/OU=YourOrganizationalUnit/CN=example.com"
+#   echo ""
+#   echo "INFO: Creating Self-Signed Certificate"
+#   cert_subject="/C=$mqtt_cert_C/ST=$mqtt_cert_ST/L=$mqtt_cert_L/O=$mqtt_cert_O/OU=$mqtt_cert_OU/CN=$mqtt_cert_CN"
+#   openssl req -new -x509 -days $mqtt_cert_days -nodes -out $mqtt_tls_ca_cert -keyout $mqtt_tls_ca_key -subj $cert_subject
+
+#   # Set the permissions on the certificate files
+#   chmod 600 $mqtt_tls_ca_key $mqtt_tls_ca_cert $mqtt_tls_cert $mqtt_tls_key
+#   chown mosquitto:mosquitto $mqtt_tls_ca_key $mqtt_tls_ca_cert $mqtt_tls_cert $mqtt_tls_key
+# fi
 
 # Configure the Mosquitto Broker
 echo ""
