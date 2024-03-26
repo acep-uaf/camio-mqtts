@@ -132,6 +132,9 @@ mqtt_config+="\n\n"
 mqtt_config+="listener $mqtt_port $mqtt_host"
 mqtt_config+="\n\n"
 mqtt_config+="allow_anonymous $mqtt_allow_anon"
+if [ $mqtt_auth_status ]; then
+    mqtt_config+="password_file $mqtt_passwd_file"
+fi
 mqtt_config+="\n\n"
 
 if [ $mqtt_tls_status ]; then
@@ -143,10 +146,6 @@ if [ $mqtt_tls_status ]; then
     mqtt_config+="\n\n"
 fi
 
-if [ $mqtt_auth_status ]; then
-    mqtt_config+="password_file $mqtt_passwd_file"
-    mqtt_config+="\n\n"
-fi
 
 echo "DEBUG: mqtt_config"
 echo -e "$mqtt_config"
