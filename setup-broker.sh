@@ -149,9 +149,9 @@ fi
 mqtt_config+="\n"
 
 if [ $mqtt_tls_status ]; then
-    mqtt_config+="cafile $mqtt_tls_ca\n"
-    mqtt_config+="certfile $mqtt_tls_cert\n"
-    mqtt_config+="keyfile $mqtt_tls_key\n"
+    mqtt_config+="cafile $mqtt_tls_ca_cert\n"
+    mqtt_config+="certfile $mqtt_tls_server_cert\n"
+    mqtt_config+="keyfile $mqtt_tls_server_key\n"
     mqtt_config+="\n"
 fi
 
