@@ -158,8 +158,7 @@ fi
 
 # Configure MQTT Passwords
 if [ $mqtt_auth_status ]; then
-  # if ! /etc/mosquitto/passwd
-  if [ ! -f /etc/mosquitto/passwd ]; then
+  if [ ! -f $mqtt_passwd_file ]; then
     echo ""
     echo "INFO: Creating Mosquitto Password File: $mqtt_passwd_file"
     echo "Please enter a password for the user: $mqtt_user"
