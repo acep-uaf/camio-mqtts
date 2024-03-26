@@ -40,11 +40,13 @@ source $rundir/losd/losd-lib.sh
 
 losd_json=$(losd)
 
+host_name=$(echo $losd_json | jq '.HOST.HOSTNAME' | sed -r 's/"//g')
 os_name=$(echo $losd_json | jq '.DISTRO.NAME' | sed -r 's/"//g')
 os_version=$(echo $losd_json | jq '.DISTRO.VERSION' | sed -r 's/"//g')
 hw_platform=$(echo $losd_json | jq '.HARDWARE.HOSTNAMECTL.Chassis' | tr -dc '[:print:]' | sed -r 's/\s//g' | sed -r 's/"//g')
 ip_addr=$(echo $losd_json | jq .HARDWARE.NETWORK | jq -r '.[] | select(.INTERFACE != "lo") | .IPV4_ADDR')
 
+echo "Host Name:         $host_name"
 echo "OS Name:           $os_name"
 echo "OS Version:        $os_version"
 echo "Hardware Platform: $hw_platform"
