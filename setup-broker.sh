@@ -44,8 +44,8 @@ os_name=$(echo $losd_json | jq '.DISTRO.NAME' | sed -r 's/"//g')
 os_version=$(echo $losd_json | jq '.DISTRO.VERSION' | sed -r 's/"//g')
 hw_platform=$(echo $losd_json | jq '.HARDWARE.HOSTNAMECTL.Chassis' | tr -dc '[:print:]' | sed -r 's/\s//g' | sed -r 's/"//g')
 
-echo "OS Name: $os_name"
-echo "OS Version: $os_version"
+echo "OS Name:           $os_name"
+echo "OS Version:        $os_version"
 echo "Hardware Platform: $hw_platform"
 
 # Check if the OS is supported
@@ -54,6 +54,15 @@ if [[ ! " ${supported_os[@]} " =~ " ${os_name} " ]]; then
     exit 1
 fi
 
+
+echo "WARNING:"
+echo "This script [setup-broker.sh] will install and configure a TLS secured Mosquitto MQTT Broker."
+read -p "Continue [y/N]:" ans
+
+if [[ "$ans" != "y" && "$ans" != "Y" ]]; then
+    echo "INFO: Aborting Script."
+    exit 1
+fi
 
 # Install the necessary packages
 apt update
