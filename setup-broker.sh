@@ -163,6 +163,10 @@ if [ $mqtt_auth_status ]; then
     echo "INFO: Creating Mosquitto Password File: $mqtt_passwd_file"
     echo "Please enter a password for the user: $mqtt_user"
     mosquitto_passwd -c $mqtt_passwd_file $mqtt_user
+
+    # Set the permissions on the password file
+    chmod 600 $mqtt_passwd_file
+    chown mosquitto:mosquitto $mqtt_passwd_file
   fi
 fi
 
@@ -175,12 +179,20 @@ if [ ! -f $mqtt_tls_ca ] || [ ! -f $mqtt_tls_cert ] || [ ! -f $mqtt_tls_key ]; t
   echo "INFO: Creating Self-Signed Certificate"
   cert_subject="/C=$mqtt_cert_C/ST=$mqtt_cert_ST/L=$mqtt_cert_L/O=$mqtt_cert_O/OU=$mqtt_cert_OU/CN=$mqtt_cert_CN"
   openssl req -new -x509 -days $mqtt_cert_days -nodes -out $mqtt_tls_ca_cert -keyout $mqtt_tls_ca_key -subj $cert_subject
+
+  # Set the permissions on the certificate files
+  chmod 600 $mqtt_tls_ca_key $mqtt_tls_ca_cert $mqtt_tls_cert $mqtt_tls_key
+  chown mosquitto:mosquitto $mqtt_tls_ca_key $mqtt_tls_ca_cert $mqtt_tls_cert $mqtt_tls_key
 fi
 
 # Configure the Mosquitto Broker
 echo ""
 echo "INFO: Configuring Mosquitto Broker: $mqtt_conf_file"
 echo -e $mqtt_config > $mqtt_conf_file
+
+# Set the permissions on the configuration file
+chmod 644 $mqtt_conf_file
+chown mosquitto:mosquitto $mqtt_conf_file
 
 # Configure the UFW Firewall
 echo ""
