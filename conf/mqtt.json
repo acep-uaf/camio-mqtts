@@ -23,8 +23,8 @@
         "ENABLED": true,
         "HOST": "",
         "PORT": 8883,
-        "CA_KEY": "/etc/mosquitto/certs/ca.key",
-        "CA_CERT": "/etc/mosquitto/certs/ca.crt",
+        "CA_KEY": "/etc/mosquitto/ca_certificates/ca.key",
+        "CA_CERT": "/etc/mosquitto/ca_certificates/ca.crt",
         "CERTIFICATE": "/etc/mosquitto/certs/cert.pem",
         "PRIVATE_KEY": "/etc/mosquitto/certs/privkey.pem"
     },

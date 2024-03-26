@@ -161,6 +161,8 @@ fi
 if [ $mqtt_auth_status ]; then
   # if ! /etc/mosquitto/passwd
   if [ ! -f /etc/mosquitto/passwd ]; then
+    echo "INFO: Creating Mosquitto Password File: $mqtt_passwd_file"
+    echo "Please enter a password for the user: $mqtt_user"
     mosquitto_passwd -c $mqtt_passwd_file $mqtt_user
   fi
 fi
