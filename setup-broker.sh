@@ -172,7 +172,7 @@ fi
 
 # Create a self-signed certificate
 # If either file is missing: $mqtt_tls_ca, $mqtt_tls_cert or $mqtt_tls_key
-if [ ! -f $mqtt_tls_ca ] || [ ! -f $mqtt_tls_cert ] || [ ! -f $mqtt_tls_key ]; then
+if [ ! -f $mqtt_tls_ca_key ] || [ ! -f $mqtt_tls_ca_cert ] || [ ! -f $mqtt_tls_cert ] || [ ! -f $mqtt_tls_key ]; then
   # Based on example from:
   # openssl req -new -x509 -days 365 -nodes -out example.crt -keyout example.key -subj "/C=US/ST=YourState/L=YourCity/O=YourOrganization/OU=YourOrganizationalUnit/CN=example.com"
   echo ""
