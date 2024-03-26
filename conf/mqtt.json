@@ -1,7 +1,7 @@
 {
     "CONFIG": {
         "CONFIG_FILE": "/etc/mosquitto/conf.d/default.conf",
-        "PASSWORD_FILE": "/etc/mosquitto/passwd"
+        "PASSWD_FILE": "/etc/mosquitto/passwd"
     },
     "BROKER": {
         "HOST": "localhost",
