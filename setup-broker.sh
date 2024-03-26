@@ -186,11 +186,11 @@ if [ ! -f $mqtt_tls_ca_key ] || [ ! -f $mqtt_tls_ca_cert ] || [ ! -f $mqtt_tls_s
   
   # Generate the CA key and certificate files
   openssl genpkey -algorithm RSA -out $mqtt_tls_ca_key
-  openssl req -new -x509 -key $mqtt_tls_ca_key -out $mqtt_tls_ca_cert -days $mqtt_cert_days -subj $cert_subject
+  openssl req -new -x509 -key $mqtt_tls_ca_key -out $mqtt_tls_ca_cert -days $mqtt_cert_days -subj "$cert_subject"
   
   # Generate the server key and CSR
   openssl genpkey -algorithm RSA -out $mqtt_tls_server_key
-  openssl req -new -key $mqtt_tls_server_key -out $mqtt_tls_server_csr -subj $cert_subject
+  openssl req -new -key $mqtt_tls_server_key -out $mqtt_tls_server_csr -subj "$cert_subject"
   
   # Sign the server CSR with the CA certificate and key
   openssl x509 -req -in $mqtt_tls_server_csr -CA $mqtt_tls_ca_cert -CAkey $mqtt_tls_ca_key -CAcreateserial -out $mqtt_tls_server_cert -days $mqtt_cert_days
