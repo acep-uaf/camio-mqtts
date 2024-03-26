@@ -1,0 +1,34 @@
+{
+    "CONFIG": {
+        "CONFIG_FILE": "/etc/mosquitto/conf.d/default.conf",
+        "PASSWORD_FILE": "/etc/mosquitto/passwd"
+    },
+    "BROKER": {
+        "HOST": "localhost",
+        "PORT": 1883
+    },
+    "CERT": {
+        "TYPE": "self-signed",
+        "SUBJECT": {
+            "C": "US",
+            "ST": "Alaska",
+            "L": "Fairbanks",
+            "O": "Univeristy of Alaska Fairbanks",
+            "OU": "Alaska Center for Energy and Power",
+            "CN": "camio-mqtt-broker.acep.uaf.edu"
+        }
+    },
+    "TLS" : {
+        "ENABLED": true,
+        "HOST": "",
+        "PORT": 8883,
+        "CERTIFICATE": "/etc/mosquitto/certs/cert.pem",
+        "PRIVATE_KEY": "/etc/mosquitto/certs/privkey.pem"
+    },
+    "AUTH": {
+        "ENABLED": true,
+        "USERS": [
+            "camio"
+        ]
+    }
+}
