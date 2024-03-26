@@ -25,8 +25,9 @@
         "PORT": 8883,
         "CA_KEY": "/etc/mosquitto/ca_certificates/ca.key",
         "CA_CERT": "/etc/mosquitto/ca_certificates/ca.crt",
-        "CERTIFICATE": "/etc/mosquitto/certs/cert.pem",
-        "PRIVATE_KEY": "/etc/mosquitto/certs/privkey.pem"
+        "SERVER_KEY": "/etc/mosquitto/certs/server.key",
+        "SERVER_CSR": "/etc/mosquitto/certs/server.csr",
+        "SERVER_CERT": "/etc/mosquitto/certs/server.crt"
     },
     "AUTH": {
         "ENABLED": true,

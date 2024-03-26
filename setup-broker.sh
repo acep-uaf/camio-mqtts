@@ -70,8 +70,10 @@ mqtt_tls_status=$(echo $mqtt_json | jq '.TLS.ENABLED' | sed -r 's/"//g')
 if [ $mqtt_tls_status ]; then
   mqtt_tls_ca_key=$(echo $mqtt_json | jq '.TLS.CA_KEY' | sed -r 's/"//g')
   mqtt_tls_ca_cert=$(echo $mqtt_json | jq '.TLS.CA_CERT' | sed -r 's/"//g')
-  mqtt_tls_cert=$(echo $mqtt_json | jq '.TLS.CERTIFICATE' | sed -r 's/"//g')
-  mqtt_tls_key=$(echo $mqtt_json | jq '.TLS.PRIVATE_KEY' | sed -r 's/"//g')
+  mqtt_tls_server_key=$(echo $mqtt_json | jq '.TLS.SERVER_KEY' | sed -r 's/"//g')
+  mqtt_tls_server_csr=$(echo $mqtt_json | jq '.TLS.SERVER_CSR' | sed -r 's/"//g')
+  mqtt_tls_server_cert=$(echo $mqtt_json | jq '.TLS.SERVER_CERT' | sed -r 's/"//g')
+
   mqtt_host=$(echo $mqtt_json | jq '.TLS.HOST' | sed -r 's/"//g')
   mqtt_port=$(echo $mqtt_json | jq '.TLS.PORT' | sed -r 's/"//g')
 
@@ -172,44 +174,32 @@ fi
 
 
 # Create a self-signed certificate
-# If either file is missing: $mqtt_tls_ca, $mqtt_tls_cert or $mqtt_tls_key
-if [ ! -f $mqtt_tls_ca_key ] || [ ! -f $mqtt_tls_ca_cert ] || [ ! -f $mqtt_tls_cert ] || [ ! -f $mqtt_tls_key ]; then
-  # Based on example from:
-  # openssl req -new -x509 -days 365 -nodes -out example.crt -keyout example.key -subj "/C=US/ST=YourState/L=YourCity/O=YourOrganization/OU=YourOrganizationalUnit/CN=example.com"
+# If either file is missing: $mqtt_tls_ca_key, $mqtt_tls_ca_cert, $mqtt_tls_server_key or $mqtt_tls_server_cert
+if [ ! -f $mqtt_tls_ca_key ] || [ ! -f $mqtt_tls_ca_cert ] || [ ! -f $mqtt_tls_server_key ] || [ ! -f $mqtt_tls_server_cert ]; then
   echo ""
   echo "INFO: Creating Self-Signed Certificate"
   cert_subject="/C=$mqtt_cert_C/ST=$mqtt_cert_ST/L=$mqtt_cert_L/O=$mqtt_cert_O/OU=$mqtt_cert_OU/CN=$mqtt_cert_CN"
+  echo "DEBUG: cert_subject: $cert_subject"
   
   # Create the directories for the certificate files if they do not exist
-  mkdir -p $(dirname $mqtt_tls_ca_cert) $(dirname $mqtt_tls_ca_key) $(dirname $mqtt_tls_cert) $(dirname $mqtt_tls_key)
+  mkdir -p $(dirname $mqtt_tls_ca_cert) $(dirname $mqtt_tls_ca_key) $(dirname $mqtt_tls_server_cert) $(dirname $mqtt_tls_server_key)
   
   # Generate the CA key and certificate files
   openssl genpkey -algorithm RSA -out $mqtt_tls_ca_key
   openssl req -new -x509 -key $mqtt_tls_ca_key -out $mqtt_tls_ca_cert -days $mqtt_cert_days -subj $cert_subject
   
-  # Generate the server key and certificate files
-  openssl genpkey -algorithm RSA -out $mqtt_tls_key
-  openssl req -new -key $mqtt_tls_key -out $mqtt_tls_cert -subj $cert_subject
+  # Generate the server key and CSR
+  openssl genpkey -algorithm RSA -out $mqtt_tls_server_key
+  openssl req -new -key $mqtt_tls_server_key -out $mqtt_tls_server_csr -subj $cert_subject
+  
+  # Sign the server CSR with the CA certificate and key
+  openssl x509 -req -in $mqtt_tls_server_csr -CA $mqtt_tls_ca_cert -CAkey $mqtt_tls_ca_key -CAcreateserial -out $mqtt_tls_server_cert -days $mqtt_cert_days
   
   # Set the permissions on the certificate files
-  chmod 600 $mqtt_tls_ca_key $mqtt_tls_ca_cert $mqtt_tls_cert $mqtt_tls_key
-  chown mosquitto:mosquitto $mqtt_tls_ca_key $mqtt_tls_ca_cert $mqtt_tls_cert $mqtt_tls_key
+  chmod 600 $mqtt_tls_ca_key $mqtt_tls_ca_cert $mqtt_tls_server_cert $mqtt_tls_server_key
+  chown mosquitto:mosquitto $mqtt_tls_ca_key $mqtt_tls_ca_cert $mqtt_tls_server_cert $mqtt_tls_server_key
 fi
 
-# # Create a self-signed certificate
-# # If either file is missing: $mqtt_tls_ca, $mqtt_tls_cert or $mqtt_tls_key
-# if [ ! -f $mqtt_tls_ca_key ] || [ ! -f $mqtt_tls_ca_cert ] || [ ! -f $mqtt_tls_cert ] || [ ! -f $mqtt_tls_key ]; then
-#   # Based on example from:
-#   # openssl req -new -x509 -days 365 -nodes -out example.crt -keyout example.key -subj "/C=US/ST=YourState/L=YourCity/O=YourOrganization/OU=YourOrganizationalUnit/CN=example.com"
-#   echo ""
-#   echo "INFO: Creating Self-Signed Certificate"
-#   cert_subject="/C=$mqtt_cert_C/ST=$mqtt_cert_ST/L=$mqtt_cert_L/O=$mqtt_cert_O/OU=$mqtt_cert_OU/CN=$mqtt_cert_CN"
-#   openssl req -new -x509 -days $mqtt_cert_days -nodes -out $mqtt_tls_ca_cert -keyout $mqtt_tls_ca_key -subj $cert_subject
-
-#   # Set the permissions on the certificate files
-#   chmod 600 $mqtt_tls_ca_key $mqtt_tls_ca_cert $mqtt_tls_cert $mqtt_tls_key
-#   chown mosquitto:mosquitto $mqtt_tls_ca_key $mqtt_tls_ca_cert $mqtt_tls_cert $mqtt_tls_key
-# fi
 
 # Configure the Mosquitto Broker
 echo ""
