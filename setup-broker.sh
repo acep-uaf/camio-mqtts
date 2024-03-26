@@ -79,7 +79,7 @@ mqtt_auth_status=$(echo $mqtt_json | jq '.AUTH.ENABLED' | sed -r 's/"//g')
 # if mqtt_auth_status is true, then set mqtt_auth_status to "Enabled", else set it to "Disabled"
 if [ $mqtt_auth_status ]; then
   mqtt_allow_anon=false
-  mqtt_passwd_file=$(echo $mqtt_json | jq '.AUTH.PASSWD_FILE' | sed -r 's/"//g')
+  mqtt_passwd_file=$(echo $mqtt_json | jq '.CONFIG.PASSWD_FILE' | sed -r 's/"//g')
   mqtt_user=$(echo $mqtt_json | jq '.AUTH.USERS[0]' | sed -r 's/"//g')
 fi
 
