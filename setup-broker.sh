@@ -58,15 +58,19 @@ if [[ ! " ${supported_os[@]} " =~ " ${os_name} " ]]; then
     exit 1
 fi
 
-
+echo ""
 echo "WARNING:"
 echo "This script [setup-broker.sh] will install and configure a TLS secured Mosquitto MQTT Broker."
 read -p "Continue [y/N]:" ans
+echo ""
 
 if [[ "$ans" != "y" && "$ans" != "Y" ]]; then
     echo "INFO: Aborting Script."
     exit 1
 fi
+
+# ==================== BEGIN MQTTS SETUP SCRIPT ====================
+
 
 # Install the necessary packages
 apt update
