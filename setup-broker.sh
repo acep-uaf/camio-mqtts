@@ -68,6 +68,7 @@ mqtt_port=$(echo $mqtt_json | jq '.BROKER.PORT' | sed -r 's/"//g')
 mqtt_tls_status=$(echo $mqtt_json | jq '.TLS.ENABLED' | sed -r 's/"//g')
 # if mqtt_tls_status is true, then set mqtt_tls_status to "Enabled", else set it to "Disabled"
 if [ $mqtt_tls_status ]; then
+  mqtt_tls_ca=$(echo $mqtt_json | jq '.TLS.CA_CERT' | sed -r 's/"//g')
   mqtt_tls_cert=$(echo $mqtt_json | jq '.TLS.CERTIFICATE' | sed -r 's/"//g')
   mqtt_tls_key=$(echo $mqtt_json | jq '.TLS.PRIVATE_KEY' | sed -r 's/"//g')
   mqtt_host=$(echo $mqtt_json | jq '.TLS.HOST' | sed -r 's/"//g')
@@ -134,6 +135,8 @@ mqtt_config+="allow_anonymous $mqtt_allow_anon"
 mqtt_config+="\n\n"
 
 if [ $mqtt_tls_status ]; then
+    mqtt_config+="cafile $mqtt_tls_ca"
+    mqtt_config+="\n"
     mqtt_config+="certfile $mqtt_tls_cert"
     mqtt_config+="\n"
     mqtt_config+="keyfile $mqtt_tls_key"
