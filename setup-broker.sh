@@ -129,7 +129,6 @@ fi
 
 # ==================== BEGIN MQTTS SETUP SCRIPT ====================
 
-
 # Install the necessary packages
 apt update
 apt install -y mosquitto mosquitto-clients ufw
